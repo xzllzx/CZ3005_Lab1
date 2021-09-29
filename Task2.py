@@ -3,7 +3,7 @@ import json
 from copy import deepcopy
 
 '''
-Reads json data and returns it as a nested dictionary of {node: {neighbour: weight}}
+Reads json data and returns it as a nested dictionary of {node: {neighbour: dist, cost}}
 '''
 def dist_cost_dict():
     dist_cost_dict = {}
@@ -44,8 +44,11 @@ def constrained_UCS(graph_dict, start, end, max_cost):
     # Initialisation
     start = str(start)
     end = str(end)
+
     # Use PriorityQueue to select the next node with the shortest total distance for expansion
     q = PriorityQueue()
+
+    # q is formatted as (distance, energy cost, path)
     q.put((0.0, 0.0, [start]))
     visited = []
 
