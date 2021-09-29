@@ -37,9 +37,9 @@ def dist_cost_dict():
     return dist_cost_dict
 
 '''
-Performs a UCS to find the shortest path from a start node to an end node
+Performs a UCS to find the shortest path from a start node to an end node, within an energy constraint
 '''
-def UCS(graph_dict, start, end, max_cost):
+def constrained_UCS(graph_dict, start, end, max_cost):
     # Initialisation
     start = str(start)
     end = str(end)
@@ -56,19 +56,16 @@ def UCS(graph_dict, start, end, max_cost):
         # Last node in the current path to obtain current node
         current_node = path[-1]
 
-        if current_node not in visited:
+        if current_node not in visited  and current_cost <= max_cost:
             visited.append(current_node)
 
             # Goal state reached
-            if current_node == end and current_cost <= max_cost:
-                return path, current_distance, current_cost
-                break
+            if current_node == end:
+                return True, path, current_distance, current_cost
 
             # Puts the distance, path into queue
             for new_neighbour in graph_dict[current_node]:
                 # Total distance to reach the node from start
-                #print(float(graph_dict[current_node][new_neighbour][0]))
-                #print(float(graph_dict[current_node][new_neighbour][1]))
                 updated_distance = current_distance + float(graph_dict[current_node][new_neighbour][0])
                 updated_cost = current_cost + float(graph_dict[current_node][new_neighbour][1])
 
@@ -76,11 +73,66 @@ def UCS(graph_dict, start, end, max_cost):
                 updated_path = path.copy()
                 updated_path.append(new_neighbour)
                 q.put((updated_distance, updated_cost, updated_path))
+    
+    print("No paths found between the two nodes.")
+    # Return what?
+    return False, path, current_distance, current_cost
+
+
+'''
+Performs a UCS to find the cheapest path from a start node to an end node
+'''
+def min_cost_UCS(graph_dict, start, end, max_distance):
+    # Initialisation
+    start = str(start)
+    end = str(end)
+    # Use PriorityQueue to select the next node with the lowest total cost for expansion
+    q = PriorityQueue()
+    q.put((0, 0, [start]))
+    visited = []
+
+    while not q.empty():
+        current_cost, current_distance, path = q.get()
+        # Last node in the current path to obtain current node
+        current_node = path[-1]
+
+        if current_node not in visited  and current_distance <= max_distance:
+            visited.append(current_node)
+
+            # Goal state reached
+            if current_node == end:
+                return True, path, current_distance, current_cost
+
+            # Puts the distance, path into queue
+            for new_neighbour in graph_dict[current_node]:
+                # Total distance to reach the node from start
+                updated_distance = current_distance + float(graph_dict[current_node][new_neighbour][0])
+                updated_cost = current_cost + float(graph_dict[current_node][new_neighbour][1])
+
+                # Path to reach the node from start
+                updated_path = path.copy()
+                updated_path.append(new_neighbour)
+                q.put((updated_cost, updated_distance, updated_path))
+    
+    print("No paths found between the two nodes.")
+    # Return what?
+    return False, path, current_distance, current_cost
+
 
 if __name__ == "__main__":
-    test_dict = dist_cost_dict()
-    # print(test_dict['1'])
-    path, dist, cost = UCS(test_dict, '1', '50', 287932)
+    Task2_dict = dist_cost_dict()
+    path_found, path, dist, cost = constrained_UCS(Task2_dict, '1', '50', 300000)
+    
+    '''
     print("Path: ", path)
     print("Dist: ", dist)
     print("Cost: ", cost)
+    '''
+    
+    if not path_found:
+        path_found, path, dist, cost = min_cost_UCS(Task2_dict, '1', '50', 180000)
+    
+    if path_found:
+        print("Path: ", path)
+        print("Dist: ", dist)
+        print("Cost: ", cost)

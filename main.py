@@ -11,7 +11,7 @@ import Task1, Task2, Task3
 
 # Task 1
 def Task_1():
-    weighted_dict = Task1.distance_dict()
+    Task1_dict = Task1.distance_dict()
     print("Enter the 2 nodes")
 
     # Loop until no KeyError
@@ -21,7 +21,7 @@ def Task_1():
         x = '1'
         y = '50'
         try:
-            return Task1.UCS(weighted_dict, x, y)
+            return Task1.UCS(Task1_dict, x, y)
         except KeyError:
             print("Invalid nodes were entered - Please try again.")
 

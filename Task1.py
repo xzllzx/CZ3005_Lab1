@@ -55,7 +55,6 @@ def UCS(graph_dict, start, end):
             # Goal state reached
             if current_node == end:
                 return path, current_distance
-                break
 
             # Puts the distance, path into queue
             for new_neighbour in graph_dict[current_node]:
