@@ -10,24 +10,30 @@ import Task1, Task2, Task3
 
 if __name__ == "__main__":
     while(True):
-        choice = input("\nPlease select the task: ")
+        print("\n(1) ------- Task 1: Shortest path with no energy constraints")
+        print("(2) ------- Task 2: Uninformed search for shortest path with energy constraints")
+        print("(3) ------- Task 3: A* search for shortest path with no energy constraints")
+        print("(4) ------- Exit")
+        choice = input("Please input your choice: ")
+        
         if choice == '4':
             break
-        
-        manual = input("Please enter 1 to use default values from Lab Assignment, or enter 2 to manually input values: ")
-        
-        if manual == '1':
-            start = '1'
-            end = '50'
-            energy = 287932
-        elif manual == '2':
-            start = input("Please input the starting node: ")
-            end = input("Please input the goal node: ")
-            if choice != '1':
-                energy = int(input("Please input the energy budget: "))
-        else:
-            print("Invalid choice - please try again.")
-            continue
+
+        if choice == '1' or choice == '2' or choice == '3':
+            manual = input("Please enter 1 to use default values from Lab Assignment, or enter 2 to manually input values: ")
+            
+            if manual == '1':
+                start = '1'
+                end = '50'
+                energy = 287932
+            elif manual == '2':
+                start = input("Please input the starting node: ")
+                end = input("Please input the goal node: ")
+                if choice != '1':
+                    energy = int(input("Please input the energy budget: "))
+            else:
+                print("Invalid choice - please try again.")
+                continue
                 
         if choice == '1':
             Task1.execute(start, end)
@@ -38,3 +44,5 @@ if __name__ == "__main__":
         else:
             print("Invalid choice - please try again.")
             continue
+        
+        done = input("\nPress enter to continue...")
