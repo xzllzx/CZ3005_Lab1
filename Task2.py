@@ -53,19 +53,19 @@ def constrained_UCS(graph_dict, start, end, max_cost):
     visited = []
 
     while not q.empty():
-        # IMPORTANT
-        # CONSIDER PRIORITISING QUEUE BY CURRENT_COST AND HAVING A MORE LENIENT STOPPING POINT
-        # IMPORTANT
         current_distance, current_cost, path = q.get()
         # Last node in the current path to obtain current node
         current_node = path[-1]
 
+        # Goal state reached
+        if current_node == end:
+            if current_cost <= max_cost:
+                return True, True, path, current_distance, current_cost
+            else:
+                return False, True, path, current_distance, current_cost
+
         if current_node not in visited  and current_cost <= max_cost:
             visited.append(current_node)
-
-            # Goal state reached
-            if current_node == end:
-                return True, path, current_distance, current_cost
 
             # Puts the distance, path into queue
             for new_neighbour in graph_dict[current_node]:
@@ -78,9 +78,8 @@ def constrained_UCS(graph_dict, start, end, max_cost):
                 updated_path.append(new_neighbour)
                 q.put((updated_distance, updated_cost, updated_path))
     
-    print("No paths found between the two nodes.")
-    # Return what?
-    return False, path, current_distance, current_cost
+    # No path found, queue empty
+    return False, False, path, current_distance, current_cost
 
 '''
 Performs a UCS to find alternate shortest paths from a start node to an end node, within an energy constraint
@@ -222,20 +221,49 @@ def min_cost_UCS(graph_dict, start, end, max_distance):
     return False, path, current_distance, current_cost
 
 
-if __name__ == "__main__":
+'''
+Initial UCS finds an existing path, but it does not meet the energy constraints.
+Repeat UCS iteratively - in each iteration, remove a single edge from the shortest path.
+'''
+def repeat_UCS(path, dist_cost_dict, start, end, max_cost):
+    for i in range(1,len(path)):
+        try:
+            node1 = path[i-1]
+            node2 = path[i]
+            temp = dist_cost_dict[node1][node2]
+
+            # Delete an edge
+            del(dist_cost_dict[node1][node2])
+
+            energy_met, path_found, path, dist, cost = constrained_UCS(dist_cost_dict, start, end, max_cost)
+
+            # Add deleted edge back
+            dist_cost_dict[node1][node2] = temp
+
+            if energy_met and path_found:
+                return energy_met, path_found, path, dist, cost
+            
+        except IndexError:
+            continue
+    
+    print("No path meeting the energy constraints exist.")
+    return energy_met, path_found, path, dist, cost
+
+def execute(start, end, energy):
     Task2_dict = dist_cost_dict()
-    path_found, path, dist, cost = constrained_UCS(Task2_dict, '1', '50', 300000)
     
-    '''
-    print("Path: ", path)
-    print("Dist: ", dist)
-    print("Cost: ", cost)
-    '''
+    energy_met, path_found, path, dist, cost = constrained_UCS(Task2_dict, start, end, energy)    
+
+    # If path not found, repeat constrained_UCS, but remove one edge each loop
+    if not energy_met:
+        if path_found:
+            print("Path found between the two nodes requires too much energy. Continuing search.")
+            energy_met, path_found, path, dist, cost = repeat_UCS(path, Task2_dict, start, end, energy)
+        else:
+            print("No paths found between the node pair.")
     
-    if not path_found:
-        path_found, path, dist, cost = min_cost_UCS(Task2_dict, '1', '50', 183000)
-    
-    if path_found:
+    if energy_met and path_found:
+        print("Shortest path meeting energy constraints found.\n")
         path = '->'.join(path)
         print("Shortest path: ", path)
         print("\nShortest distance: ", dist)

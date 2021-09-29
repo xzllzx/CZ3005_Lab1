@@ -68,3 +68,18 @@ def UCS(graph_dict, start, end):
                 updated_path = path.copy()
                 updated_path.append(new_neighbour)
                 q.put((updated_distance, updated_path))
+
+def execute(start, end):
+    Task1_dict = distance_dict()
+    #print("Enter the 2 nodes")
+
+    # Loop until no KeyError
+    while(True):
+        try:
+            path, total_distance = UCS(Task1_dict, start, end)
+            break
+        except KeyError:
+            print("Invalid nodes were entered - Please try again.")
+
+    path = '->'.join(path)
+    print("Shortest path: ", path, "\n\nShortest Distance: ", total_distance)
