@@ -41,7 +41,7 @@ def UCS(graph_dict, start, end):
     end = str(end)
     # Use PriorityQueue to select the next node with the shortest total distance for expansion
     q = PriorityQueue()
-    q.put((0, [start]))
+    q.put((0.0, [start]))
     visited = []
 
     while not q.empty():
