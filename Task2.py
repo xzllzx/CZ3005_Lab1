@@ -121,7 +121,7 @@ def min_cost_UCS(graph_dict, start, end, max_distance):
 
 if __name__ == "__main__":
     Task2_dict = dist_cost_dict()
-    path_found, path, dist, cost = constrained_UCS(Task2_dict, '1', '50', 300000)
+    path_found, path, dist, cost = constrained_UCS(Task2_dict, '1', '50', 200000)
     
     '''
     print("Path: ", path)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     '''
     
     if not path_found:
-        path_found, path, dist, cost = min_cost_UCS(Task2_dict, '1', '50', 180000)
+        path_found, path, dist, cost = min_cost_UCS(Task2_dict, '1', '50', 183000)
     
     if path_found:
         print("Path: ", path)

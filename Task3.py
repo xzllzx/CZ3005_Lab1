@@ -1,0 +1,1 @@
+# Use Coord.json for straight-line distance, for A* search
