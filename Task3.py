@@ -55,10 +55,9 @@ def constrained_Astar(straight_dict, dist_cost_dict, start, end, max_cost):
         # Goal state reached
         if current_node == end:
             if current_cost <= max_cost:
-                return True, path, current_distance, current_cost
+                return True, True, path, current_distance, current_cost
             else:
-                print("Path found between the two nodes requires too much energy.")
-                return False, path, current_distance, current_cost
+                return False, True, path, current_distance, current_cost
 
         if current_node not in visited:
             visited.append(current_node)
@@ -76,34 +75,48 @@ def constrained_Astar(straight_dict, dist_cost_dict, start, end, max_cost):
                 q.put((updated_total_est_distance, updated_distance, updated_cost, updated_path))
 
     # No path found, queue empty
-    return False, path, current_distance, current_cost
+    return False, False, path, current_distance, current_cost
+
+'''
+Initial A* search finds an existing path, but it does not meet the energy constraints.
+Repeat A* search iteratively - in each iteration, remove a single edge from the shortest path.
+'''
+def repeat_Astar(path, straight_dict, dist_cost_dict, start, end, max_cost):
+    for i in range(1,len(path)-1):
+        node1 = path[i-1]
+        node2 = path[i]
+        temp = Task3_dist_cost_dict[node1][node2]
+
+        # Delete an edge
+        del(Task3_dist_cost_dict[node1][node2])
+
+        energy_met, path_found, path, dist, cost = constrained_Astar(straight_dict, dist_cost_dict, start, end, max_cost)
+
+        # Add deleted edge back
+        Task3_dist_cost_dict[node1][node2] = temp
+
+        if energy_met and path_found:
+            return energy_met, path_found, path, dist, cost
+    
+    print("No path meeting the energy constraints exist.")
+    return energy_met, path_found, path, dist, cost
 
 if __name__ == "__main__":
     Task3_straight_dict = straight_goal_dict('50')
     Task3_dist_cost_dict = Task2.dist_cost_dict()
 
-    path_found, path, dist, cost = constrained_Astar(Task3_straight_dict, Task3_dist_cost_dict, '1', '50', 287932)
+    energy_met, path_found, path, dist, cost = constrained_Astar(Task3_straight_dict, Task3_dist_cost_dict, '1', '50', 290000)
     
-    print(path)
     # If path not found, repeat constrained_Astar, but remove one edge each loop
-    if not path_found:
-        for i in range(1,len(path)-1):
-            node1 = path[i-1]
-            node2 = path[i]
-            temp = Task3_dist_cost_dict[node1][node2]
+    if not energy_met:
+        if path_found:
+            print("Path found between the two nodes requires too much energy. Continuing search.")
+            energy_met, path_found, path, dist, cost = repeat_Astar(path, Task3_straight_dict, Task3_dist_cost_dict, '1', '50', 290000)
+        else:
+            print("No paths exist between the node pair.")
 
-            # Delete an edge
-            del(Task3_dist_cost_dict[node1][node2])
-
-            path_found, path, dist, cost = constrained_Astar(Task3_straight_dict, Task3_dist_cost_dict, '1', '50', 287932)
-
-            # Add deleted edge back
-            Task3_dist_cost_dict[node1][node2] = temp
-
-            if path_found:
-                break    
-
-    if path_found:
+    if energy_met and path_found:
+        print("Shortest path meeting energy constraints found.\n")
         path = '->'.join(path)
         print("Shortest path: ", path)
         print("\nShortest distance: ", dist)
