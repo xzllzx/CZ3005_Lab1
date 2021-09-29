@@ -133,6 +133,7 @@ if __name__ == "__main__":
         path_found, path, dist, cost = min_cost_UCS(Task2_dict, '1', '50', 183000)
     
     if path_found:
-        print("Path: ", path)
-        print("Dist: ", dist)
-        print("Cost: ", cost)
+        path = '->'.join(path)
+        print("Shortest path: ", path)
+        print("\nShortest distance: ", dist)
+        print("Total energy cost: ", cost)

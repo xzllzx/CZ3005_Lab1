@@ -12,7 +12,7 @@ import Task1, Task2, Task3
 # Task 1
 def Task_1():
     Task1_dict = Task1.distance_dict()
-    print("Enter the 2 nodes")
+    #print("Enter the 2 nodes")
 
     # Loop until no KeyError
     while(True):
@@ -27,4 +27,5 @@ def Task_1():
 
 if __name__ == "__main__":
     path, total_distance = Task_1()
-    print("Path taken: ", path, "\nTotal Distance: ", total_distance)
+    path = '->'.join(path)
+    print("Shortest path: ", path, "\n\nShortest Distance: ", total_distance)
