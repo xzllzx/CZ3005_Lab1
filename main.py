@@ -16,8 +16,10 @@ def Task_1():
 
     # Loop until no KeyError
     while(True):
-        x = input("Start node: ")
-        y = input("End node: ")
+        #x = input("Start node: ")
+        #y = input("End node: ")
+        x = '1'
+        y = '50'
         try:
             return Task1.UCS(weighted_dict, x, y)
         except KeyError:
