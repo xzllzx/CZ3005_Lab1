@@ -11,10 +11,10 @@ import time
 
 if __name__ == "__main__":
     while(True):
-        print("\n(1) ------- Task 1: Shortest path with no energy constraints")
-        print("(2) ------- Task 2: Uninformed search for shortest path with energy constraints")
-        print("(3) ------- Task 3: A* search for shortest path with no energy constraints")
-        print("(4) ------- Exit")
+        print("\n(1) ------- Task 1: Shortest path without energy constraints",
+              "\n(2) ------- Task 2: Uninformed search for shortest path with energy constraints",
+              "\n(3) ------- Task 3: A* search for shortest path with energy constraints",
+              "\n(4) ------- Exit")
         choice = input("Please input your choice: ")
         
         if choice == '4':
