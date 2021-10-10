@@ -1,4 +1,5 @@
 import Task1, Task2, Task3
+import time
 
 # G, Coord contains 264346 nodes
 # G is a dictionary with k,v Node: [Neighbour_list]
@@ -19,7 +20,7 @@ if __name__ == "__main__":
         if choice == '4':
             break
 
-        if choice == '1' or choice == '2' or choice == '3':
+        if choice in {'1','2','3'}:
             manual = input("Please enter 1 to use default values from Lab Assignment, or enter 2 to manually input values: ")
             
             if manual == '1':
@@ -34,7 +35,8 @@ if __name__ == "__main__":
             else:
                 print("Invalid choice - please try again.")
                 continue
-                
+
+        time_start = time.process_time()
         if choice == '1':
             Task1.execute(start, end)
         elif choice == '2':            
@@ -45,4 +47,5 @@ if __name__ == "__main__":
             print("Invalid choice - please try again.")
             continue
         
+        print("Time taken for execution: ", time.process_time() - time_start, " seconds")
         done = input("\nPress enter to continue...")

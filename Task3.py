@@ -126,5 +126,5 @@ def execute(start, end, energy):
         print("Total energy cost: ", cost)
 
 if __name__ == "__main__":
-    execute('1', '4', 100000)
+    execute('1', '50', 287932)
     
