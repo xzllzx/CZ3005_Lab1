@@ -18,6 +18,7 @@ if __name__ == "__main__":
         choice = input("Please input your choice: ")
         
         if choice == '4':
+            print("Exiting...")
             break
         elif choice in {'1','2','3'}:
             manual = input("Please enter 1 to use default values from Lab Assignment, or enter 2 to manually input values: ")
@@ -37,7 +38,8 @@ if __name__ == "__main__":
         else:
             print("Invalid choice - please try again.")
             continue
-
+        
+        print()
         time_start = time.process_time()
         if choice == '1':
             Task1.execute(start, end)
