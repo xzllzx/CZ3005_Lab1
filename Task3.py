@@ -22,7 +22,7 @@ def straight_goal_dict(end_node):
 
         # Obtains straight line distance from node to each neighbour
         straight_line_dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        
+
         # Adds the node and straight line distance to end node as key-value pair to dictionary straight_goal_dict
         straight_goal_dict[node] = straight_line_dist
 
@@ -67,7 +67,7 @@ def constrained_Astar(straight_dict, dist_cost_dict, start, end, max_cost):
                 # Total distance to reach the node from start
                 updated_distance = current_distance + float(dist_cost_dict[current_node][new_neighbour][0])
                 updated_cost = current_cost + float(dist_cost_dict[current_node][new_neighbour][1])
-                updated_total_est_distance = current_distance + straight_dict[current_node]
+                updated_total_est_distance = updated_distance + straight_dict[new_neighbour]
 
                 # Path to reach the node from start
                 updated_path = path.copy()
