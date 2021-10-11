@@ -71,7 +71,6 @@ def UCS(graph_dict, start, end):
 
 def execute(start, end):
     Task1_dict = distance_dict()
-    #print("Enter the 2 nodes")
 
     # Loop until no KeyError
     while(True):
