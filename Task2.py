@@ -64,7 +64,7 @@ def constrained_UCS(graph_dict, start, end, max_cost):
             else:
                 return False, True, path, current_distance, current_cost
 
-        if current_node not in visited  and current_cost <= max_cost:
+        if current_node not in visited and current_cost <= max_cost:
             visited.append(current_node)
 
             # Puts the distance, path into queue
@@ -268,7 +268,6 @@ def execute(start, end, energy):
         print("Shortest path: ", path)
         print("\nShortest distance: ", dist)
         print("Total energy cost: ", cost)
-
 
 if __name__ == "__main__":
     execute('1', '50', 287932)

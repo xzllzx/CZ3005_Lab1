@@ -83,3 +83,6 @@ def execute(start, end):
 
     path = '->'.join(path)
     print("Shortest path: ", path, "\n\nShortest Distance: ", total_distance)
+
+if __name__ == "__main__":
+    execute('1', '50', 287932)
