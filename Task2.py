@@ -268,3 +268,7 @@ def execute(start, end, energy):
         print("Shortest path: ", path)
         print("\nShortest distance: ", dist)
         print("Total energy cost: ", cost)
+
+
+if __name__ == "__main__":
+    execute('1', '50', 287932)
