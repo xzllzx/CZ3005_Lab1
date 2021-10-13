@@ -22,228 +22,161 @@
 // declaration of start symbol; no need to change this
 %goal Module;
 
+// temporary declaration, you can remove this once you have written all other rules
+//%goal Dummy;
 
-Module
-	= MODULE ID LCURLY Imports Declarations RCURLY
-	;
+/* TODO: Flesh out the rule for Module, and add rules for other nonterminals. Here is an example
+         of a rule you may want to add:
+         
+   Accessibility = PUBLIC
+		  |
+		  ;
+  */
 
-Imports
-	= Imports Import
-	| 
-	;
-		
-Import
-	= IMPORT ID SEMICOLON
-	;
+Module = MODULE ID LCURLY ImportList DeclarationList RCURLY;
 
-Declarations
-	= Declarations Declaration
-	| 
-	; 
-
-Declaration
-	= FunctionDecl
-	| FieldDecl
-	| TypeDecl
-	;
-			
-FunctionDecl
-	= Accessibility TypeName ID LPAREN ParameterList RPAREN LCURLY StatementList RCURLY
-	;
-
-FieldDecl
-	= Accessibility TypeName ID SEMICOLON
-	;
-
-TypeDecl
-	= Accessibility TYPE ID EQL STRING_LITERAL SEMICOLON
-	;
-
-Accessibility
-	= PUBLIC
-	| 
-	;
-
-TypeName
-	= PrimitiveType
-	| ArrayType
-	| ID
-	;
-
-PrimitiveType
-	= VOID
-	| BOOLEAN
-	| INT
-	;
-		
-ArrayType
-	= ArrayType     LBRACKET RBRACKET 
-	| PrimitiveType LBRACKET RBRACKET
-	| ID            LBRACKET RBRACKET
-	;
-				
-ParameterList
-	= ParameterList COMMA Parameter
-	| Parameter
-	| 
-	; 
-			
-Parameter
-	= TypeName ID
-	;
-	
-StatementList
-	= StatementList Statement
-	| 
-	;
-				
-Statement
-	= LocalVarDecl
-	| StatementBlock
-	| IfStatement
-	| WhileStatement
-	| BreakStatement
-	| ReturnStatement
-	| ExprStatement
-	;
-
-LocalVarDecl
-	= TypeName ID SEMICOLON
-	;
-
-StatementBlock
-	= LCURLY StatementList RCURLY
-	;
-
-IfStatement
-	= IF LPAREN Expression RPAREN Statement OptionalElseStatement
-	;
-
-OptionalElseStatement
-	= ELSE Statement
+ImportList = Imports
 	|
 	;
 
-WhileStatement
-	= WHILE LPAREN Expression RPAREN Statement
+Imports = Import Imports
+	|	Import;
+
+Import = IMPORT ID SEMICOLON;
+
+DeclarationList = Declarations
+	|
 	;
 
-BreakStatement
-	= BREAK SEMICOLON
+Declarations = Declaration Declarations
+	|	Declaration
 	;
 
-ReturnStatement
-	= RETURN OptionalExpr SEMICOLON
+Declaration = FunctionDeclaration
+	|	FieldDeclaration
+	|	TypeDeclaration
 	;
 
-OptionalExpr
-	= Expression
-	| 
-	;
-			
-ExprStatement
-	= Expression SEMICOLON
+FunctionDeclaration = Accessibility TypeName ID LPAREN ParameterList RPAREN LCURLY StatementList RCURLY;
+
+FieldDeclaration = Accessibility TypeName ID SEMICOLON;
+
+TypeDeclaration = Accessibility TYPE ID EQL STRING_LITERAL SEMICOLON;
+
+Accessibility = PUBLIC
+	|
 	;
 
-Expression
-	= Assignment
-	| RHSExpr
-	;
-			
-Assignment
-	= LHSExpr EQL Expression
+TypeName = PrimitiveType
+	|	ArrayType
+	|	ID
 	;
 
-LHSExpr
-	= ID
-	| ArrayAccess
-	;
-		
-ArrayAccess
-	= LHSExpr LBRACKET Expression RBRACKET
+PrimitiveType = VOID
+	|	BOOLEAN
+	|	INT
 	;
 
-RHSExpr
-	= ArithmeticExpr OptionalArithmeticExpr
+ArrayType = PrimitiveType LBRACKET RBRACKET
+	|	ArrayType LBRACKET RBRACKET
+	|	ID LBRACKET RBRACKET
 	;
 
-OptionalArithmeticExpr
-	= ComparisonOp ArithmeticExpr
-	| 
-	;
-						
-ComparisonOp
-	= EQEQ
-	| NEQ
-	| LT
-	| LEQ
-	| GT
-	| GEQ
+ParameterList = Parameters
+	|
 	;
 
-ArithmeticExpr
-	= ArithmeticExpr AdditiveOp Term
-	| Term
+Parameters = Parameter COMMA Parameters
+	|	Parameter
 	;
 
-AdditiveOp 
-	= PLUS
-	| MINUS
-	;				
+Parameter = TypeName ID;
 
-Term 
-	= Term MultiplicativeOp Factor
-	| Factor
-	;
-	
-MultiplicativeOp 
-	= TIMES
-	| DIV
-	| MOD
-	;
-				
-Factor 
-	= MINUS Factor
-	| PrimaryExpr
-	;
-		
-PrimaryExpr 
-	= LHSExpr
-	| FunctionCall
-	| ArrayExpr
-	| STRING_LITERAL
-	| INT_LITERAL
-	| BooleanLiteral
-	| ParenthesisedExpr
-	;
-			
-FunctionCall 
-	= ID LPAREN ExpressionList RPAREN
+StatementList = Statements
+	|
 	;
 
-ExpressionList 
-	= ExpressionList COMMA Expression
-	| Expression
-	| 
-	;
-				
-ArrayExpr 
-	= LBRACKET ExpressionListNonEmpty RBRACKET
+Statements = Statement Statements
+	|	Statement
 	;
 
-ExpressionListNonEmpty 
-	= ExpressionListNonEmpty COMMA Expression
-	| Expression
+Statement = TypeName ID SEMICOLON //local variable declaration
+	|	LCURLY StatementList RCURLY //block of statements
+	|	IF LPAREN Expression RPAREN Statement //if statement
+	|	IF LPAREN Expression RPAREN Statement ELSE Statement //if else statement
+	|	WHILE LPAREN Expression RPAREN Statement //while statement
+	|	BREAK SEMICOLON //break statement
+	|	RETURN SEMICOLON //return statement
+	|	RETURN Expression SEMICOLON //return expression statement
+	|	Expression SEMICOLON //expression statement
 	;
 
-BooleanLiteral 
-	= TRUE
-	| FALSE
-	;
-				
-ParenthesisedExpr 
-	= LPAREN Expression RPAREN
+ExpressionList = Expressions
+	|
 	;
 
+Expressions = Expression COMMA Expressions
+	|	Expression
+	;
+
+Expression = Assignment
+	|	RHSExpression
+	;
+
+Assignment = LHSExpression EQL Expression;
+
+LHSExpression = ID
+	|	IndexExpr
+	;
+
+IndexExpr = ID LBRACKET LHSExpression RBRACKET
+	|	IndexExpr LBRACKET LHSExpression RBRACKET
+	;
+
+RHSExpression = ArithmeticExpression
+	|	ArithmeticExpression ComparisonOperator ArithmeticExpression
+	;
+
+ComparisonOperator = EQEQ
+	|	NEQ
+	|	LT
+	|	LEQ
+	|	GT
+	|	GEQ
+	;
+
+ArithmeticExpression = ArithmeticExpression AdditiveOperator Term
+	|	Term
+	;
+
+AdditiveOperator = PLUS
+	|	MINUS
+	;
+
+Term = Term MultiplicativeOperator Factor
+	|	Factor
+	;
+
+MultiplicativeOperator = TIMES
+	|	DIV
+	|	MOD
+	;
+
+Factor = MINUS Factor
+	|	PrimaryExpression
+	;
+
+PrimaryExpression = LHSExpression //left hand side expression
+	|	ID LPAREN ExpressionList RPAREN //function call
+	|	LBRACKET Expressions RBRACKET //array expression
+	|	STRING_LITERAL //string literal
+	|	INT_LITERAL //integer literal
+	|	TRUE	|	FALSE //Boolean literals TRUE and FALSE
+	|	LPAREN Expression RPAREN //parenthesised expression
+	;
 
 /**/
+
+/* Dummy rule to make the lexer compile. Remove this once you have written all other rules. */	  
+/*Dummy = MODULE INT VOID IF ELSE WHILE RETURN BREAK BOOLEAN PUBLIC TRUE FALSE INT_LITERAL STRING_LITERAL ID TYPE IMPORT
+           PLUS MINUS TIMES DIV MOD EQEQ NEQ LEQ GEQ LT GT LBRACKET RPAREN COMMA RCURLY LCURLY SEMICOLON RBRACKET LPAREN EQL;*/
