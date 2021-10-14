@@ -22,161 +22,196 @@
 // declaration of start symbol; no need to change this
 %goal Module;
 
-// temporary declaration, you can remove this once you have written all other rules
-//%goal Dummy;
 
-/* TODO: Flesh out the rule for Module, and add rules for other nonterminals. Here is an example
-         of a rule you may want to add:
-         
-   Accessibility = PUBLIC
-		  |
-		  ;
-  */
 
-Module = MODULE ID LCURLY ImportList DeclarationList RCURLY;
-
-ImportList = Imports
-	|
-	;
-
+Module = MODULE ID LCURLY Imports Declarations RCURLY;
 Imports = Import Imports
-	|	Import;
-
-Import = IMPORT ID SEMICOLON;
-
-DeclarationList = Declarations
-	|
-	;
+		|
+		;
+		
+Import = IMPORT ID SEMICOLON ;
 
 Declarations = Declaration Declarations
-	|	Declaration
-	;
+		|
+		;
+		
+Declaration = Function
+		| Field
+		| Type
+		;
+		
+Function = Accessibility TypeName ID LPAREN ParameterList RPAREN LCURLY StatementList RCURLY;
 
-Declaration = FunctionDeclaration
-	|	FieldDeclaration
-	|	TypeDeclaration
-	;
+Field = Accessibility TypeName ID SEMICOLON;
 
-FunctionDeclaration = Accessibility TypeName ID LPAREN ParameterList RPAREN LCURLY StatementList RCURLY;
+Type = Accessibility TYPE ID EQL STRING_LITERAL SEMICOLON;
 
-FieldDeclaration = Accessibility TypeName ID SEMICOLON;
-
-TypeDeclaration = Accessibility TYPE ID EQL STRING_LITERAL SEMICOLON;
 
 Accessibility = PUBLIC
-	|
-	;
-
+		|
+		;
+		
 TypeName = PrimitiveType
-	|	ArrayType
-	|	ID
-	;
-
+		| ArrayType
+		| ID
+		;
+		
 PrimitiveType = VOID
-	|	BOOLEAN
-	|	INT
-	;
+		| BOOLEAN
+		| INT
+		;
+		
+/*LALR conflict -- need to expand the nonterminal*/
+
+ArrayType = TypeName LBRACKET RBRACKET
 
 ArrayType = PrimitiveType LBRACKET RBRACKET
-	|	ArrayType LBRACKET RBRACKET
-	|	ID LBRACKET RBRACKET
-	;
+		  | ArrayType LBRACKET RBRACKET
+		  | ID LBRACKET RBRACKET
+		  ;
+  
+  
+A parameter list is a possibly empty list of parameters separated by commas. A parameter is a type name
+followed by an identifier.
+		  
+Parameter = TypeName ID;  /* conflict? */
 
-ParameterList = Parameters
-	|
-	;
+ParameterList = Parameter ParameterTail   
+		|
+		;
 
-Parameters = Parameter COMMA Parameters
-	|	Parameter
-	;
+ParameterTail = COMMA Parameter ParameterTail
+		|
+		;		
 
-Parameter = TypeName ID;
 
-StatementList = Statements
-	|
-	;
 
-Statements = Statement Statements
-	|	Statement
-	;
-
-Statement = TypeName ID SEMICOLON //local variable declaration
-	|	LCURLY StatementList RCURLY //block of statements
-	|	IF LPAREN Expression RPAREN Statement //if statement
-	|	IF LPAREN Expression RPAREN Statement ELSE Statement //if else statement
-	|	WHILE LPAREN Expression RPAREN Statement //while statement
-	|	BREAK SEMICOLON //break statement
-	|	RETURN SEMICOLON //return statement
-	|	RETURN Expression SEMICOLON //return expression statement
-	|	Expression SEMICOLON //expression statement
-	;
-
-ExpressionList = Expressions
-	|
-	;
-
-Expressions = Expression COMMA Expressions
-	|	Expression
-	;
-
+StatementList = Statement StatementList
+		|
+		;
+		
+Statement = TypeName ID SEMICOLON
+		| LCURLY StatementList RCURLY
+		| IF LPAREN Expression RPAREN Statement ELSE Statement    
+		| IF LPAREN Expression RPAREN Statement
+		| WHILE LPAREN Expression RPAREN Statement
+		| BREAK SEMICOLON
+		| RETURN SEMICOLON
+ 		| RETURN Expression SEMICOLON
+ 		| Expression SEMICOLON
+ 		;
+ 
+// An expression is either an assignment or a right hand side expression.
 Expression = Assignment
-	|	RHSExpression
+		| RHSExpression
+		;
+// An assignment is a left hand side expression, followed by a single equals sign, followed by an expression.
+Assignment = LHSExpression EQL Expression ;
+// A left hand side expression is either an identifier or an array access. 
+// LHSExpression = ID
+// 		| ArrayAccess 
+// 		;
+
+
+LHSExpression = ID LHSExpressionTail
 	;
 
-Assignment = LHSExpression EQL Expression;
+LHSExpressionTail = LBRACKET Expression RBRACKET LHSExpressionTail
+	|
+	; 
 
-LHSExpression = ID
-	|	IndexExpr
-	;
+//Alternate LHSExpression
+//LHSExpression = ID
+//              | ArrayAccess
+//              ;
 
-IndexExpr = ID LBRACKET LHSExpression RBRACKET
-	|	IndexExpr LBRACKET LHSExpression RBRACKET
-	;
+//ArrayAccess = ID LBRACKET Expression RBRACKET
+//            | ArrayAccess LBRACKET Expression RBRACKET ;
 
+//An array access is a left hand side expression, followed by an opening bracket, followed by an expression, 
+// followed by a closing bracket.
+//ArrayAccess = LHSExpression LBRACKET Expression RBRACKET;
+// A right hand side expression is an arithmetic expression, optionally followed by a comparison operator and
+// another arithmetic expression. 
 RHSExpression = ArithmeticExpression
-	|	ArithmeticExpression ComparisonOperator ArithmeticExpression
-	;
+			  | ArithmeticExpression ComparisonOp ArithmeticExpression
+			  ;
+// A comparison operator is one of EQEQ, NEQ, LT, LEQ, GT, GEQ.
+ComparisonOp = EQEQ
+		| NEQ
+		| LT
+		| LEQ
+		| GT
+		| GEQ
+		;
+// An arithmetic expression is either an arithmetic expression, followed by an additive operator, followed by a
+// term; or just a term. 
 
-ComparisonOperator = EQEQ
-	|	NEQ
-	|	LT
-	|	LEQ
-	|	GT
-	|	GEQ
-	;
+// ArithmeticExpression = ArithmeticExpression AdditiveOp Term
+// 		| Term
+// 		;
+ArithmeticExpression = Term ArithmeticExpressionTail
+					 ;
+ArithmeticExpressionTail = AdditiveOp Term ArithmeticExpressionTail
+						 |
+						 ;
 
-ArithmeticExpression = ArithmeticExpression AdditiveOperator Term
-	|	Term
-	;
+		
+// An additive operator is either PLUS or MINUS.
+AdditiveOp = PLUS
+		| MINUS
+		;
+// A term is either a term, followed by a multiplicative operator, followed by a factor; or just a factor. 
+// Term = Term MultiplicativeOp Factor 
+// 		| Factor
+// 		;
+Term = Factor TermTail
+	 ;
+TermTail = MultiplicativeOp Factor TermTail
+		 |
+		 ;
 
-AdditiveOperator = PLUS
-	|	MINUS
-	;
 
-Term = Term MultiplicativeOperator Factor
-	|	Factor
-	;
-
-MultiplicativeOperator = TIMES
-	|	DIV
-	|	MOD
-	;
-
+// A multiplicative operator is one of TIMES, DIV, MOD.
+MultiplicativeOp = TIMES
+		| DIV
+		| MOD
+		;
+// A factor is either a MINUS followed by a factor, or a primary expression.
 Factor = MINUS Factor
-	|	PrimaryExpression
-	;
+		| PrimaryExpr
+		;
+// A primary expression is one of the following:
+	// • a left hand side expression;
+	// • a function call: 
+	// • an array expression: an opening bracket, followed by a non-empty list of expressions separated by
+	// comma, followed by a closing bracket;
+	// • a string literal;
+	// • an integer literal;
+PrimaryExpr = LHSExpression
+		| FunctionCall
+		| ArrayExpression
+		| STRING_LITERAL
+		| INT_LITERAL
+		| TRUE
+		| FALSE
+		| LPAREN Expression RPAREN
+		;
+//FunctionCall : an identifier, followed by an opening parenthesis, 
+//followed by a possibly empty list of expressions separated by comma, followed by a closing parenthesis;	
+FunctionCall = ID LPAREN ExpressionList RPAREN;
+ExpressionList = Expression ExpressionTail
+		|
+		;
+ExpressionTail = COMMA Expression ExpressionTail
+		|
+		;
 
-PrimaryExpression = LHSExpression //left hand side expression
-	|	ID LPAREN ExpressionList RPAREN //function call
-	|	LBRACKET Expressions RBRACKET //array expression
-	|	STRING_LITERAL //string literal
-	|	INT_LITERAL //integer literal
-	|	TRUE	|	FALSE //Boolean literals TRUE and FALSE
-	|	LPAREN Expression RPAREN //parenthesised expression
-	;
-
-/**/
-
+// an array expression: an opening bracket, followed by a non-empty list of expressions separated by
+// comma, followed by a closing bracket;
+ArrayExpression = LBRACKET Expression ExpressionTail RBRACKET;
 /* Dummy rule to make the lexer compile. Remove this once you have written all other rules. */	  
-/*Dummy = MODULE INT VOID IF ELSE WHILE RETURN BREAK BOOLEAN PUBLIC TRUE FALSE INT_LITERAL STRING_LITERAL ID TYPE IMPORT
-           PLUS MINUS TIMES DIV MOD EQEQ NEQ LEQ GEQ LT GT LBRACKET RPAREN COMMA RCURLY LCURLY SEMICOLON RBRACKET LPAREN EQL;*/
+// Dummy = MODULE INT VOID IF ELSE WHILE RETURN BREAK BOOLEAN PUBLIC TRUE FALSE INT_LITERAL STRING_LITERAL ID TYPE IMPORT
+//            PLUS MINUS TIMES DIV MOD EQEQ NEQ LEQ GEQ LT GT LBRACKET RPAREN COMMA RCURLY LCURLY SEMICOLON RBRACKET LPAREN EQL; 
+ 
+// /**/
